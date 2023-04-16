@@ -8,7 +8,7 @@ import pybullet as pb
 from .math_utils import mat2pb, pb2mat
 from .mesh_utils import filter_mesh, save_mesh_obj
 
-__all__ = ('HandBody')
+__all__ = "HandBody"
 
 
 class HandBody:
@@ -20,11 +20,15 @@ class HandBody:
     FLAG_JOINT_LIMITS = 8  # apply joint limits
     FLAG_DYNAMICS = 16  # overide default dynamics parameters
     FLAG_USE_SELF_COLLISION = 32  # enable self collision
-    FLAG_DEFAULT = sum([FLAG_ENABLE_COLLISION_SHAPES,
-                        FLAG_ENABLE_VISUAL_SHAPES,
-                        FLAG_JOINT_LIMITS,
-                        FLAG_DYNAMICS,
-                        FLAG_USE_SELF_COLLISION])
+    FLAG_DEFAULT = sum(
+        [
+            FLAG_ENABLE_COLLISION_SHAPES,
+            FLAG_ENABLE_VISUAL_SHAPES,
+            FLAG_JOINT_LIMITS,
+            FLAG_DYNAMICS,
+            FLAG_USE_SELF_COLLISION,
+        ]
+    )
 
     def __init__(self, client, hand_model, flags=FLAG_DEFAULT, shape_betas=None):
         """HandBody constructor.
@@ -51,7 +55,7 @@ class HandBody:
         self._apply_joint_limits()
         self._apply_dynamics()
 
-    @ property
+    @property
     def body_id(self):
         """Body unique id in the simulator.
 
@@ -60,7 +64,7 @@ class HandBody:
         """
         return self._body_id
 
-    @ property
+    @property
     def joint_indices(self):
         """Articulated joint indices.
 
@@ -69,7 +73,7 @@ class HandBody:
         """
         return self._joint_indices
 
-    @ property
+    @property
     def joint_limits(self):
         """Articulated joints angle bounds.
 
@@ -120,17 +124,16 @@ class HandBody:
         """
         if self._constraint_id != -1:
             self._client.changeConstraint(
-                self._constraint_id,
-                jointChildPivot=position,
-                jointChildFrameOrientation=orientation,
-                maxForce=10.0)
+                self._constraint_id, jointChildPivot=position, jointChildFrameOrientation=orientation, maxForce=10.0
+            )
         if joint_angles is not None:
             self._client.setJointMotorControlArray(
                 bodyUniqueId=self._body_id,
                 jointIndices=self._joint_indices,
                 controlMode=pb.POSITION_CONTROL,
                 targetPositions=joint_angles,
-                forces=[0.5]*len(joint_angles))
+                forces=[0.5] * len(joint_angles),
+            )
 
     def get_mano_state(self):
         """Get current hand state as a MANO model state.
@@ -189,9 +192,9 @@ class HandBody:
                 link_visual_indices.append(-1)
                 link_positions.append(origin_rel)
                 link_orientations.append(mat2pb(basis_rel))
-                link_parent_indices.append(parent_index+1)
+                link_parent_indices.append(parent_index + 1)
                 link_joint_types.append(pb.JOINT_REVOLUTE)
-                link_joint_axis.append(np.eye(3)[ord(axis) - ord('x')])
+                link_joint_axis.append(np.eye(3)[ord(axis) - ord("x")])
                 origin_rel, basis_rel = [0.0, 0.0, 0.0], np.eye(3)
                 parent_index = len(link_masses) - 1
                 self._link_mapping[j] = parent_index
@@ -227,7 +230,8 @@ class HandBody:
             linkParentIndices=link_parent_indices,
             linkJointTypes=link_joint_types,
             linkJointAxis=link_joint_axis,
-            flags=flags)
+            flags=flags,
+        )
 
     def _make_collision_shape(self, link_index, basis):
         if self.FLAG_ENABLE_COLLISION_SHAPES & self._flags:
@@ -237,7 +241,8 @@ class HandBody:
                     fileName=filename,
                     meshScale=[1.0, 1.0, 1.0],
                     collisionFramePosition=[0, 0, 0],
-                    collisionFrameOrientation=mat2pb(basis))
+                    collisionFrameOrientation=mat2pb(basis),
+                )
         return -1
 
     def _make_visual_shape(self, link_index, basis):
@@ -250,7 +255,8 @@ class HandBody:
                     rgbaColor=[0.0, 1.0, 0.0, 1.0],
                     specularColor=[1.0, 1.0, 1.0],
                     visualFramePosition=[0.0, 0.0, 0.0],
-                    visualFrameOrientation=mat2pb(basis))
+                    visualFrameOrientation=mat2pb(basis),
+                )
         return -1
 
     def _make_constraint(self):
@@ -263,37 +269,31 @@ class HandBody:
                 jointType=pb.JOINT_FIXED,
                 jointAxis=[0.0, 0.0, 0.0],
                 parentFramePosition=[0.0, 0.0, 0.0],
-                childFramePosition=[0.0, 0.0, 0.0])
+                childFramePosition=[0.0, 0.0, 0.0],
+            )
         return -1
 
     def _apply_joint_limits(self):
         if self.FLAG_JOINT_LIMITS & self._flags:
             for i, limits in zip(self._joint_indices, self._joint_limits):
                 self._client.changeDynamics(
-                    bodyUniqueId=self._body_id,
-                    linkIndex=i,
-                    jointLowerLimit=limits[0],
-                    jointUpperLimit=limits[1])
+                    bodyUniqueId=self._body_id, linkIndex=i, jointLowerLimit=limits[0], jointUpperLimit=limits[1]
+                )
 
     def _apply_dynamics(self):
         if self.FLAG_DYNAMICS & self._flags:
             self._client.changeDynamics(
-                bodyUniqueId=self._body_id,
-                linkIndex=-1,
-                linearDamping=10.0,
-                angularDamping=10.0)
+                bodyUniqueId=self._body_id, linkIndex=-1, linearDamping=10.0, angularDamping=10.0
+            )
 
             for i in [0] + self._joint_indices:
                 self._client.changeDynamics(
-                    bodyUniqueId=self._body_id,
-                    linkIndex=i,
-                    restitution=0.5,
-                    lateralFriction=5.0,
-                    spinningFriction=5.0)
+                    bodyUniqueId=self._body_id, linkIndex=i, restitution=0.5, lateralFriction=5.0, spinningFriction=5.0
+                )
 
     @contextlib.contextmanager
     def _temp_link_mesh(self, link_index, collision):
-        with tempfile.NamedTemporaryFile('w', suffix='.obj') as temp_file:
+        with tempfile.NamedTemporaryFile("w", suffix=".obj") as temp_file:
             threshold = 0.2
             if collision and link_index in [4, 7, 10]:
                 threshold = 0.7
