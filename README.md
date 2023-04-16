@@ -1,6 +1,8 @@
 # mano_pybullet
 [MANO](http://mano.is.tue.mpg.de/)-based hand models for the [PyBullet](https://pybullet.org/wordpress/) simulator.
 
+## Update
+We update a hand model with a degree of freedom (Dof) of 22. The reconstructed rotation axes remain consistent with the `AxisLayerFK` defined in [manotorch](https://github.com/lixiny/manotorch). In addition, we have provided the corresponding URDF and mesh files under `urdf` folder.
 ## Install
 
 ### From source code
