@@ -36,10 +36,12 @@ class HandModel(ManoModel):
             models_dir = os.path.expandvars("$MANO_MODELS_DIR")
 
         self.manolayer = ManoLayer(
-            side="left" if left_hand else "right", mano_assets_root=models_dir.replace("/models", "")
+            side="left" if left_hand else "right",
+            mano_assets_root=models_dir.replace("/models", ""),
         )
         self.axislayer = AxisLayerFK(
-            side="left" if left_hand else "right", mano_assets_root=models_dir.replace("/models", "")
+            side="left" if left_hand else "right",
+            mano_assets_root=models_dir.replace("/models", ""),
         )
 
         self._joints = self._make_joints()
@@ -112,9 +114,9 @@ class HandModel(ManoModel):
         euler_angles[10][2] = angles[13]
         euler_angles[11][2] = angles[14]
         euler_angles[12][2] = angles[15]
-        euler_angles[13][2] = angles[16]
+        euler_angles[13][0] = angles[16]
         euler_angles[13][1] = angles[17]
-        euler_angles[13][0] = angles[18]
+        euler_angles[13][2] = angles[18]
         euler_angles[14][1] = angles[19]
         euler_angles[14][2] = angles[20]
         euler_angles[15][2] = angles[21]
@@ -123,7 +125,7 @@ class HandModel(ManoModel):
 
         return mano_pose.numpy()[0]
 
-    def mano_to_angles(self, mano_pose):
+    def mano_to_angles(self, hand_pose):
         """Convert a mano pose to joint angles of the rigid model.
 
         It is not guaranteed that the rigid model can ideally
@@ -136,8 +138,8 @@ class HandModel(ManoModel):
             tuple -- dofs angles, palm_basis
         """
 
-        mano_pose = mano_pose.reshape((-1, 3))
-        global_rot = mano_pose[0].copy()
+        mano_pose = hand_pose.reshape((-1, 3)).copy()
+        global_rot = hand_pose[0].copy()
         mano_pose[0] = np.zeros(3)
 
         mano_out = self.manolayer(torch.tensor(mano_pose).reshape(1, 16 * 3), torch.zeros(1, 10))
@@ -161,9 +163,9 @@ class HandModel(ManoModel):
         angles[13] = ee_a_tmplchd_chd[10][2]
         angles[14] = ee_a_tmplchd_chd[11][2]
         angles[15] = ee_a_tmplchd_chd[12][2]
-        angles[16] = ee_a_tmplchd_chd[13][2]
+        angles[16] = ee_a_tmplchd_chd[13][0]
         angles[17] = ee_a_tmplchd_chd[13][1]
-        angles[18] = ee_a_tmplchd_chd[13][0]
+        angles[18] = ee_a_tmplchd_chd[13][2]
         angles[19] = ee_a_tmplchd_chd[14][1]
         angles[20] = ee_a_tmplchd_chd[14][2]
         angles[21] = ee_a_tmplchd_chd[15][2]
@@ -259,20 +261,45 @@ class HandModel22(HandModel):
 
         return [
             Joint(origin["palm"], basis["palm"], "", []),
-            Joint(origin["index1"], basis["index1"], "yz", np.deg2rad([(-10, 10), (0, 90)])),
+            Joint(
+                origin["index1"],
+                basis["index1"],
+                "yz",
+                np.deg2rad([(-10, 10), (0, 90)]),
+            ),
             Joint(origin["index2"], basis["index2"], "z", np.deg2rad([(0, 100)])),
             Joint(origin["index3"], basis["index3"], "z", np.deg2rad([(0, 80)])),
-            Joint(origin["middle1"], basis["middle1"], "yz", np.deg2rad([(-10, 10), (0, 90)])),
+            Joint(
+                origin["middle1"],
+                basis["middle1"],
+                "yz",
+                np.deg2rad([(-10, 10), (0, 90)]),
+            ),
             Joint(origin["middle2"], basis["middle2"], "z", np.deg2rad([(0, 100)])),
             Joint(origin["middle3"], basis["middle3"], "z", np.deg2rad([(0, 80)])),
-            Joint(origin["pinky1"], basis["pinky1"], "yz", np.deg2rad([(-10, 10), (0, 90)])),
+            Joint(
+                origin["pinky1"],
+                basis["pinky1"],
+                "yz",
+                np.deg2rad([(-10, 10), (0, 90)]),
+            ),
             Joint(origin["pinky2"], basis["pinky2"], "z", np.deg2rad([(0, 100)])),
             Joint(origin["pinky3"], basis["pinky3"], "z", np.deg2rad([(0, 80)])),
             Joint(origin["ring1"], basis["ring1"], "yz", np.deg2rad([(-10, 10), (0, 90)])),
             Joint(origin["ring2"], basis["ring2"], "z", np.deg2rad([(0, 100)])),
             Joint(origin["ring3"], basis["ring3"], "z", np.deg2rad([(0, 80)])),
-            Joint(origin["thumb1"], basis["thumb1"], "zyx", np.deg2rad([(-45, 45), (-15, 45), (0, 45)])),
-            Joint(origin["thumb2"], basis["thumb2"], "yz", np.deg2rad([(-10, 10), (0, 90)])),
+            Joint(
+                origin["thumb1"],
+                basis["thumb1"],
+                "xyz",
+                np.deg2rad([(0, 45), (-15, 45), (-45, 45)]),
+            ),
+            Joint(
+                origin["thumb2"],
+                basis["thumb2"],
+                "yz",
+                np.deg2rad([(-10, 10), (0, 90)]),
+            ),
             Joint(origin["thumb3"], basis["thumb3"], "z", np.deg2rad([(0, 80)])),
         ]
 
