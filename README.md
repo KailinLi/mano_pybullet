@@ -1,5 +1,8 @@
-# mano_pybullet
+# mano_pybullet_22DOF
+
 [MANO](http://mano.is.tue.mpg.de/)-based hand models for the [PyBullet](https://pybullet.org/wordpress/) simulator.
+
+The package is modified from [mano_pybullet](https://github.com/ikalevatykh/mano_pybullet).
 
 ## Update
 We update a hand model with a degree of freedom (Dof) of 22. The reconstructed rotation axes remain consistent with the `AxisLayerFK` defined in [manotorch](https://github.com/lixiny/manotorch). In addition, we have provided the corresponding URDF and mesh files under `urdf` folder.
@@ -8,72 +11,35 @@ We update a hand model with a degree of freedom (Dof) of 22. The reconstructed r
 ### From source code
 
 ```
-git clone https://github.com/ikalevatykh/mano_pybullet.git
+git clone https://github.com/KailinLi/mano_pybullet.git
 cd mano_pybullet
 pip install -e .
 ```
-or if you plan to use [OpenAI gym](https://gym.openai.com/) environments:
+Make sure you also install the following dependencies:
 ```
-pip install -e .[gym]
+urdfpy
+manotorch (https://github.com/lixiny/manotorch)
 ```
 
-### Run tests
-
-```
-export MANO_MODELS_DIR='/path/to/mano_v*_*/models/'
-pytest
-```
 
 ## Download MANO models
 
 - Register at the [MANO website](http://mano.is.tue.mpg.de/) and download the models.
-- Unzip the file mano_v*_*.zip: `unzip mano_v*_*.zip`
-- Set environment variable: `export MANO_MODELS_DIR=/path/to/mano_v*_*/models/`
+- Unzip the file mano_v1_2.zip, and put the folder `mano_v1_2` into the `assets` folder.
 
 
-## Hand models
-
-The package provides MANO-based rigid hand model.
-
-![TeaTime](https://github.com/ikalevatykh/mano_pybullet/blob/main/media/tea_time.gif?raw=true "TeaTime")
-
-## Gym environments
-
-The package also provides several [OpenAI gym](https://gym.openai.com/) environments:
-
-- HandEnv - base environment with one or two hands on the scene.
-
-- HandObjectEnv - base environment with hands and an object on the scene.
-
-- HandLiftEnv - environment where the target is to lift an object.
-
-![HandLiftEnv](https://github.com/ikalevatykh/mano_pybullet/blob/main/media/lift_duck.gif?raw=true "HandLiftEnv")
-
-- HandPushEnv - environment where the target is to push an object.
-
-![HandPushEnv](https://github.com/ikalevatykh/mano_pybullet/blob/main/media/push_teddy.gif?raw=true "HandPushEnv")
-
-
-## Graphical debugging
+### Run tests
 
 ```
-python -m mano_pybullet.tools.gui_control
+python demo.py
 ```
+You should see the following demostation:
 
-usage: GUI debug tool [-h] [--dofs DOFS] [--left-hand] [--right-hand] [--visual-shapes] [--no-visual-shapes] [--self-collisions] [--no-self-collisions]
+![demo](media/demo.gif)
 
-optional arguments:
--  -h, --help            show help message and exit
--  --dofs DOFS           number of degrees of freedom (20 or 45) [default=20]
--  --left-hand           show left hand
--  --right-hand          show right hand [default]
--  --visual-shapes       show visual shapes [default]
--  --no-visual-shapes    hide visual shapes
--  --self-collisions     enable self collisions [default]
--  --no-self-collisions  disable self collisions
 
 ## Citation
-If you find mano_pybullet useful in your research, please cite the repository using the following BibTeX entry.
+If you find `mano_pybullet` and `AxisLayerFK` useful in your research, please cite the repository using the following BibTeX entry.
 ```
 @Misc{kalevatykh2020mano_pybullet,
   author =       {Kalevatykh, Igor et al.},
@@ -81,6 +47,14 @@ If you find mano_pybullet useful in your research, please cite the repository us
   howpublished = {Github},
   year =         {2020},
   url =          {https://github.com/ikalevatykh/mano_pybullet}
+}
+
+@inproceedings{yang2021cpf,
+  title={CPF: Learning a contact potential field to model the hand-object interaction},
+  author={Yang, Lixin and Zhan, Xinyu and Li, Kailin and Xu, Wenqiang and Li, Jiefeng and Lu, Cewu},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={11097--11106},
+  year={2021}
 }
 ```
 ## License
